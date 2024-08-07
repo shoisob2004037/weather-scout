@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+
+        body {
+            font-family: 'Libre Baskerville', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            transition: background 0.5s ease; /* Smooth transition for background change */
+        }
+
+        .container {
+            text-align: center;
+            background: linear-gradient(to bottom, #68d2c9 0%, #272a2b 100%);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border: 2px solid cornflowerblue;
+            max-width: 600px;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #space {
+            display: none;
+        }
+
+        #space h1, #space p {
+            margin: 5px 0;
+        }
+
+        .info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .container h1 {
+            color: red;
+        }
+
+        .container p {
+            color: black;
+            font-weight: bold;
+            font-size: 25px;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .oneDay{
+            color: black;
+            background-color: cadetblue;
+            padding: 5px;
+            margin: 5px;
+            border: 1px solid black;
+            border-radius: 10px;
+            box-shadow: 5px 5px 5px 5px rgba(0.1, 0, 0.5, 0.6);
+        }
+        .oneDay h3{
+            text-align: center;
+            font-weight: bold;
+            color: crimson;
+        }
+        .oneDay h4{
+            text-align: center;
+            font-weight: bold;
+            color: rgb(149, 13, 223);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WeatherScout</h1>
+        <p>Your reliable source for weather information</p>
+        <input type="text" id="input" placeholder="Enter a Valid City Name...">
+        <button id="btn">Search</button>
+        <div id="space">
+            <img src="clear.png" class="img" style="width: 150px; height: 150px;">
+            <p class="des">Haze</p>
+            <h1 class="temp">30 ºC</h1>
+            <div class="row" id="row">
+                <div class="col">
+                    <p id="max" style="color:rgb(149, 13, 223);">T<sub>max</sub>: 40ºC</p>
+                </div>
+                <hr style="border: 2px dotted black;">
+                <div class="col">
+                    <p id="min" style="color:rgb(149, 13, 223);">T<sub>min</sub>: 40ºC</p>
+                </div>
+            </div>
+            <p class="feels">Feels like <span style="color: red;">32 ºC </span></p>
+            <h2 class="city">Dhaka , BD</h2>
+            
+            <div class="info">
+                <div class="humidity-info">
+                    <img src="humidity.png" style="width: 25px; height: 25px;">
+                    <p style="font-size:20px ;">Humidity: </p>
+                    <p class="humidity" style="font-size:20px ; color: red;">31%</p>
+                </div>
+                <div class="wind-info">
+                    <img src="wind.png" style="width: 25px; height: 25px;">
+                    <p style="font-size:20px ;">Wind Speed: </p>
+                    <p class="wind" style="font-size:20px ; color: red;">5km/h</p>
+                </div>
+            </div>
+
+            <!-- Forecast section -->
+             <hr>
+             <h2 style="color: red; text-align: center;">Weather Forecast</h2>
+             <hr>
+            <div id="forecast"></div>
+        </div>
+        
+        <div id="error-message" class="error-message" style="display: none;">City not found. Please try another city.</div>
+    </div>
+
+    <script>
+        document.getElementById("btn").addEventListener('click', function() {
+            const cityValue = document.getElementById('input').value;
+            const apiKey = '581d0ce2a59e327160e6f0a4523bd092';
+
+            // Fetch current weather
+            const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityValue}&appid=${apiKey}&units=metric`;
+            fetch(currentWeatherUrl)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.cod === '404') {
+                        document.getElementById('error-message').style.display = 'block';
+                        document.querySelector('#space').style.display = 'none';
+                    } else {
+                        document.getElementById('error-message').style.display = 'none';
+                        const div = document.querySelector('#space');
+
+                        const img = document.querySelector('.img');
+                        if (data.weather[0].main == "Clouds") {
+                            img.src = 'clouds.png';
+                        } else if (data.weather[0].main == "Clear") {
+                            img.src = 'clear.png';
+                        } else if (data.weather[0].main == "Rain") {S
+                            img.src = 'rain.png';
+                        } else if (data.weather[0].main == "Drizzle") {
+                            img.src = 'drizzle.png';
+                        } else if (data.weather[0].main == "Mist") {
+                            img.src = 'mist.png';
+                        }
+
+                        div.style.display = 'block';
+                        const description = document.querySelector('.des');
+                        description.textContent = `${data.weather[0].main}`;
+
+                        const tempView = document.querySelector('.temp');
+                        tempView.textContent = `${data.main.temp.toFixed(0)}ºC`;
+
+                        const maxView = document.querySelector('#max');
+                        maxView.innerHTML = `T<sub>max</sub>: ${data.main.temp_max}ºC`;
+
+                        const minView = document.querySelector('#min');
+                        minView.innerHTML = `T<sub>min</sub>: ${data.main.temp_min}ºC`;
+
+                        const feelsView = document.querySelector('.feels');
+                        feelsView.textContent = `Feels like: ${data.main.feels_like}ºC`;
+
+                        const cityName = document.querySelector('.city');
+                        cityName.textContent = `${data.name}, ${data.sys.country}`;
+
+                        const humidity = document.querySelector(".humidity");
+                        humidity.textContent = `${data.main.humidity}%`;
+
+                        const wind = document.querySelector(".wind");
+                        wind.textContent = `${data.wind.speed} km/h`;
+
+                        const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${cityValue}&cnt=14&appid=${apiKey}&units=metric`;
+                        fetch(forecastUrl)
+                            .then(res => res.json())
+                            .then(forecastData => {
+                                const forecastDiv = document.getElementById('forecast');
+                                forecastDiv.innerHTML = ''; 
+
+                                forecastData.list.forEach(item => {
+                                    const iconUrl = `https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`;
+                                    const dateTime = new Date(item.dt_txt);
+                                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                                    const formattedDate = dateTime.toLocaleDateString(undefined, options);
+                                    const formattedTime = dateTime.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+
+                                    const divNew = document.createElement('div');
+                                    divNew.className = 'oneDay';
+                                    divNew.innerHTML = `
+                                        <p><strong>${formattedDate}</strong> | ${formattedTime}</p>
+                                        <img src="${iconUrl}" alt="Weather Pic">
+                                        <h3>${item.weather[0].main}</h3>
+                                        <h4>${item.main.temp.toFixed(1)}ºC</h4>
+                                        <p><b>T<sub>max:</sub> ${item.main.temp_max}ºC</b> | <b>T<sub>min:</sub> ${item.main.temp_min}ºC</b></p>
+                                    `;
+                                    forecastDiv.appendChild(divNew);
+                                });
+                            })
+                            .catch(error => {
+                                console.error('Error fetching forecast:', error);
+                            });
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('error-message').style.display = 'block';
+                    document.querySelector('#space').style.display = 'none';
+                });
+        });
+    </script>
+</body>
+</html>
